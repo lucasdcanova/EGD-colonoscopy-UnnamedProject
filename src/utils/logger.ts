@@ -16,6 +16,7 @@ export const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
   format: logFormat,
   defaultMeta: { service: 'egd-colonoscopy-api' },
+  exitOnError: false,
   transports: [
     // Write all logs to console
     new winston.transports.Console({

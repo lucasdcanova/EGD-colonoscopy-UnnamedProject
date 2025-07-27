@@ -1,0 +1,7 @@
+COMANDO PARA INICIAR O FRONTEND:
+
+cd "/Users/lucascanova/Library/Mobile Documents/com~apple~CloudDocs/EGD:Colonoscopy AI project/frontend" && PORT=3001 npx react-scripts start
+
+OU SE NÃO FUNCIONAR:
+
+cd "/Users/lucascanova/Library/Mobile Documents/com~apple~CloudDocs/EGD:Colonoscopy AI project/frontend" && PORT=3001 ./node_modules/.bin/react-scripts start

@@ -1,0 +1,31 @@
+======================================
+COMANDOS PARA INICIAR OS SERVIDORES
+======================================
+
+OPÇÃO 1 - Usando o script (recomendado):
+----------------------------------------
+cd "/Users/lucascanova/Library/Mobile Documents/com~apple~CloudDocs/EGD:Colonoscopy AI project"
+./start-servers.sh
+
+
+OPÇÃO 2 - Manualmente:
+----------------------
+# Terminal 1 - Backend API:
+cd "/Users/lucascanova/Library/Mobile Documents/com~apple~CloudDocs/EGD:Colonoscopy AI project"
+npm run dev
+
+# Terminal 2 - Frontend (abra um novo terminal):
+cd "/Users/lucascanova/Library/Mobile Documents/com~apple~CloudDocs/EGD:Colonoscopy AI project/frontend"
+npm start
+
+
+======================================
+APÓS INICIAR, ACESSE:
+======================================
+Backend API: http://localhost:3000/health
+Frontend: http://localhost:3001
+
+======================================
+PARA PARAR OS SERVIDORES:
+======================================
+Pressione Ctrl+C em cada terminal
