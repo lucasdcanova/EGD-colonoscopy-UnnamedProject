@@ -1,9 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useForm } from 'react-hook-form';
-import { FiUpload, FiCheck, FiX } from 'react-icons/fi';
+import { FiUpload, FiCheck, FiX, FiTarget } from 'react-icons/fi';
 import toast from 'react-hot-toast';
-import { uploadImage } from '../utils/api';
+import { uploadImage } from '../utils/api.ts';
 import { ImageUploadData } from '../types';
 
 export default function UploadPage() {
@@ -11,6 +11,10 @@ export default function UploadPage() {
   const [imagePreview, setImagePreview] = useState<string>('');
   const [uploading, setUploading] = useState(false);
   const [boundingBox, setBoundingBox] = useState({ x: 0, y: 0, width: 100, height: 100 });
+  const [isSelectingBBox, setIsSelectingBBox] = useState(false);
+  const [bboxCenter, setBboxCenter] = useState<{x: number, y: number} | null>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<ImageUploadData>();
 
@@ -23,6 +27,9 @@ export default function UploadPage() {
         setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+      // Reset bounding box when new image is loaded
+      setBboxCenter(null);
+      setBoundingBox({ x: 0, y: 0, width: 100, height: 100 });
     }
   }, []);
 
@@ -34,9 +41,43 @@ export default function UploadPage() {
     maxFiles: 1
   });
 
+  const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isSelectingBBox || !imageRef.current || !containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // Get image dimensions
+    const imgWidth = imageRef.current.width;
+    const imgHeight = imageRef.current.height;
+    
+    // Calculate center position relative to image
+    const centerX = Math.round((x / rect.width) * imgWidth);
+    const centerY = Math.round((y / rect.height) * imgHeight);
+    
+    // Set bounding box with default size (100x100)
+    const boxSize = 100;
+    setBboxCenter({ x: centerX, y: centerY });
+    setBoundingBox({
+      x: Math.max(0, centerX - boxSize / 2),
+      y: Math.max(0, centerY - boxSize / 2),
+      width: boxSize,
+      height: boxSize
+    });
+    
+    setIsSelectingBBox(false);
+    toast.success('Centro da lesão marcado!');
+  };
+
   const onSubmit = async (data: ImageUploadData) => {
     if (!imageFile) {
       toast.error('Por favor, selecione uma imagem');
+      return;
+    }
+
+    if (!bboxCenter) {
+      toast.error('Por favor, marque o centro da lesão na imagem');
       return;
     }
 
@@ -63,6 +104,8 @@ export default function UploadPage() {
         reset();
         setImageFile(null);
         setImagePreview('');
+        setBboxCenter(null);
+        setBoundingBox({ x: 0, y: 0, width: 100, height: 100 });
       }
     } catch (error: any) {
       toast.error(error.message || 'Erro ao enviar imagem');
@@ -80,26 +123,84 @@ export default function UploadPage() {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Imagem</h2>
           
-          <div
-            {...getRootProps()}
-            className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
-              ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}`}
-          >
-            <input {...getInputProps()} />
-            {imagePreview ? (
-              <div>
-                <img src={imagePreview} alt="Preview" className="max-w-full max-h-96 mx-auto mb-4" />
+          {!imagePreview ? (
+            <div
+              {...getRootProps()}
+              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
+                ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}`}
+            >
+              <input {...getInputProps()} />
+              <FiUpload className="mx-auto text-4xl text-gray-400 mb-4" />
+              <p className="text-gray-600">
+                {isDragActive ? 'Solte a imagem aqui' : 'Arraste uma imagem ou clique para selecionar'}
+              </p>
+            </div>
+          ) : (
+            <div>
+              <div 
+                ref={containerRef}
+                className="relative inline-block cursor-crosshair"
+                onClick={handleImageClick}
+              >
+                <img 
+                  ref={imageRef}
+                  src={imagePreview} 
+                  alt="Preview" 
+                  className="max-w-full max-h-96 mx-auto" 
+                />
+                {bboxCenter && (
+                  <>
+                    {/* Center marker */}
+                    <div 
+                      className="absolute w-4 h-4 bg-red-500 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                      style={{
+                        left: `${(bboxCenter.x / (imageRef.current?.width || 1)) * 100}%`,
+                        top: `${(bboxCenter.y / (imageRef.current?.height || 1)) * 100}%`
+                      }}
+                    />
+                    {/* Bounding box */}
+                    <div 
+                      className="absolute border-2 border-red-500 pointer-events-none"
+                      style={{
+                        left: `${(boundingBox.x / (imageRef.current?.width || 1)) * 100}%`,
+                        top: `${(boundingBox.y / (imageRef.current?.height || 1)) * 100}%`,
+                        width: `${(boundingBox.width / (imageRef.current?.width || 1)) * 100}%`,
+                        height: `${(boundingBox.height / (imageRef.current?.height || 1)) * 100}%`
+                      }}
+                    />
+                  </>
+                )}
+              </div>
+              <div className="mt-4 flex items-center justify-between">
                 <p className="text-sm text-gray-600">{imageFile?.name}</p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsSelectingBBox(true)}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center gap-2"
+                  >
+                    <FiTarget /> Marcar Centro da Lesão
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImageFile(null);
+                      setImagePreview('');
+                      setBboxCenter(null);
+                    }}
+                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  >
+                    Remover Imagem
+                  </button>
+                </div>
               </div>
-            ) : (
-              <div>
-                <FiUpload className="mx-auto text-4xl text-gray-400 mb-4" />
-                <p className="text-gray-600">
-                  {isDragActive ? 'Solte a imagem aqui' : 'Arraste uma imagem ou clique para selecionar'}
+              {isSelectingBBox && (
+                <p className="mt-2 text-sm text-blue-600 font-medium">
+                  Clique no centro da lesão para marcar sua localização
                 </p>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Required Fields */}
@@ -156,13 +257,37 @@ export default function UploadPage() {
 
             <div>
               <label className="block text-sm font-medium mb-1">Localização *</label>
-              <input
-                type="text"
+              <select
                 {...register('location', { required: 'Localização é obrigatória' })}
                 className="w-full p-2 border rounded-md"
-                placeholder="Ex: Cólon ascendente"
-              />
+              >
+                <option value="">Selecione...</option>
+                <option value="borda-anal">Borda Anal</option>
+                <option value="reto">Reto</option>
+                <option value="sigmoide">Sigmóide</option>
+                <option value="colon-descendente">Cólon Descendente</option>
+                <option value="colon-transverso">Cólon Transverso</option>
+                <option value="colon-ascendente">Cólon Ascendente</option>
+                <option value="ceco">Ceco</option>
+                <option value="ileo-terminal">Íleo Terminal</option>
+              </select>
               {errors.location && <p className="text-red-500 text-sm">{errors.location.message}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Tamanho da Lesão (mm) *</label>
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                {...register('lesionSize', { 
+                  required: 'Tamanho da lesão é obrigatório',
+                  min: { value: 0, message: 'Tamanho deve ser maior que 0' }
+                })}
+                className="w-full p-2 border rounded-md"
+                placeholder="Ex: 15.5"
+              />
+              {errors.lesionSize && <p className="text-red-500 text-sm">{errors.lesionSize.message}</p>}
             </div>
 
             <div>
@@ -184,42 +309,27 @@ export default function UploadPage() {
             </div>
           </div>
 
-          {/* Bounding Box (simplified for now) */}
+          {/* Bounding Box Display */}
           <div className="mt-4">
-            <label className="block text-sm font-medium mb-1">Bounding Box *</label>
-            <p className="text-sm text-gray-600 mb-2">
-              Defina as coordenadas da lesão (x, y, largura, altura)
-            </p>
-            <div className="grid grid-cols-4 gap-2">
-              <input
-                type="number"
-                value={boundingBox.x}
-                onChange={(e) => setBoundingBox({...boundingBox, x: parseInt(e.target.value)})}
-                className="p-2 border rounded-md"
-                placeholder="X"
-              />
-              <input
-                type="number"
-                value={boundingBox.y}
-                onChange={(e) => setBoundingBox({...boundingBox, y: parseInt(e.target.value)})}
-                className="p-2 border rounded-md"
-                placeholder="Y"
-              />
-              <input
-                type="number"
-                value={boundingBox.width}
-                onChange={(e) => setBoundingBox({...boundingBox, width: parseInt(e.target.value)})}
-                className="p-2 border rounded-md"
-                placeholder="Largura"
-              />
-              <input
-                type="number"
-                value={boundingBox.height}
-                onChange={(e) => setBoundingBox({...boundingBox, height: parseInt(e.target.value)})}
-                className="p-2 border rounded-md"
-                placeholder="Altura"
-              />
-            </div>
+            <label className="block text-sm font-medium mb-1">Bounding Box</label>
+            {bboxCenter ? (
+              <div className="bg-green-50 p-3 rounded border border-green-200">
+                <p className="text-sm text-green-700">
+                  <FiCheck className="inline mr-1" />
+                  Centro da lesão marcado em ({bboxCenter.x}, {bboxCenter.y})
+                </p>
+                <p className="text-xs text-gray-600 mt-1">
+                  Box: X={boundingBox.x}, Y={boundingBox.y}, Largura={boundingBox.width}, Altura={boundingBox.height}
+                </p>
+              </div>
+            ) : (
+              <div className="bg-yellow-50 p-3 rounded border border-yellow-200">
+                <p className="text-sm text-yellow-700">
+                  <FiX className="inline mr-1" />
+                  Faça upload de uma imagem e marque o centro da lesão
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -324,9 +434,9 @@ export default function UploadPage() {
         <div className="flex justify-end">
           <button
             type="submit"
-            disabled={uploading}
+            disabled={uploading || !bboxCenter}
             className={`px-6 py-3 rounded-md text-white font-medium flex items-center gap-2
-              ${uploading 
+              ${uploading || !bboxCenter
                 ? 'bg-gray-400 cursor-not-allowed' 
                 : 'bg-blue-600 hover:bg-blue-700'
               }`}

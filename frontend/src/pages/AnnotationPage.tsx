@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { FiSave, FiPlus, FiTrash2 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
-import { getAnnotations, createAnnotation, updateAnnotation, deleteAnnotation } from '../utils/api';
+import { getAnnotations, createAnnotation, updateAnnotation, deleteAnnotation } from '../utils/api.ts';
 import { Annotation } from '../types';
 
 export default function AnnotationPage() {

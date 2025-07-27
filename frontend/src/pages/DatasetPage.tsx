@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FiDownload, FiRefreshCw } from 'react-icons/fi';
-import { getDatasetStats, exportDataset } from '../utils/api';
+import { getDatasetStats, exportDataset } from '../utils/api.ts';
 import toast from 'react-hot-toast';
 
 export default function DatasetPage() {

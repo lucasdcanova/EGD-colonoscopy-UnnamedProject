@@ -19,6 +19,7 @@ export interface ImageUploadData {
   location: string;
   boundingBox: BoundingBox;
   confidence: number;
+  lesionSize: number; // Size in mm
 
   // Optional classifications
   parisClassification?: string;

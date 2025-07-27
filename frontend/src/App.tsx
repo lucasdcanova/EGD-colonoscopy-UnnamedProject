@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import UploadPage from './pages/UploadPage';
-import AnnotationPage from './pages/AnnotationPage';
-import DatasetPage from './pages/DatasetPage';
-import Layout from './components/Layout';
+import UploadPage from './pages/UploadPage.tsx';
+import AnnotationPage from './pages/AnnotationPage.tsx';
+import DatasetPage from './pages/DatasetPage.tsx';
+import Layout from './components/Layout.tsx';
 import './App.css';
 
 function App() {
