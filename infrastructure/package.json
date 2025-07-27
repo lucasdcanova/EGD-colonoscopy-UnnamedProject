@@ -1,0 +1,15 @@
+{
+  "name": "egd-colonoscopy-infrastructure",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Infrastructure tests for EGD/Colonoscopy AI project",
+  "scripts": {
+    "test": "node test-connections.js",
+    "create-tables": "node create-tables.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.0.0",
+    "pg": "^8.11.0",
+    "dotenv": "^16.0.0"
+  }
+}

@@ -16,10 +16,10 @@
 
 ---
 ## Fase 0 • Organização & Infra (Semanas 0-1)
-- [ ] Criar **projeto GCP** dedicado (`egd-colonscopy-ai`).
-- [ ] Definir **VPC** e sub-redes privadas.
-- [ ] Provisionar **Cloud Storage** bucket `egd-endoscopia-images` (versionamento + CMEK).
-- [ ] Criar **Cloud SQL (PostgreSQL 15)** + ativar backups automáticos.
+- [ ] Criar **conta/projeto AWS** dedicado.
+- [ ] Configurar **VPC** e security groups na AWS.
+- [ ] Provisionar **S3** bucket `egd-endoscopia-images` (versionamento + criptografia KMS).
+- [ ] Criar **Neon PostgreSQL** + ativar backups automáticos.
 - [ ] Estruturar repositório:
   ```text
   data/
