@@ -62,7 +62,11 @@ app.use('/api/dataset', datasetRouter);
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
-  const frontendBuildPath = path.join(__dirname, '../../frontend/build');
+  // Since we're using tsx, __dirname might not be what we expect
+  const rootDir = path.resolve(process.cwd());
+  const frontendBuildPath = path.join(rootDir, 'frontend', 'build');
+  
+  console.log('📁 Serving static files from:', frontendBuildPath);
   
   // Serve static files
   app.use(express.static(frontendBuildPath));
@@ -70,7 +74,9 @@ if (process.env.NODE_ENV === 'production') {
   // Handle React routing - send all non-API routes to index.html
   app.get('*', (req, res) => {
     if (!req.path.startsWith('/api')) {
-      res.sendFile(path.join(frontendBuildPath, 'index.html'));
+      const indexPath = path.join(frontendBuildPath, 'index.html');
+      console.log('📄 Serving index.html for:', req.path);
+      res.sendFile(indexPath);
     }
   });
 }

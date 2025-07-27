@@ -5,8 +5,8 @@
   "main": "dist/api/app.js",
   "scripts": {
     "dev": "tsx watch src/api/app.ts",
-    "build": "cd frontend && npm install && npm run build && cd ..",
-    "start": "tsx src/api/app.ts",
+    "build": "./build.sh",
+    "start": "NODE_ENV=production tsx src/api/app.ts",
     "start:prod": "node dist/api/app.js",
     "test": "jest",
     "test:watch": "jest --watch",
