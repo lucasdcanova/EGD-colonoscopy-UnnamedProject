@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
+import path from 'path';
 import { config } from 'dotenv';
 import uploadRouter from './routes/upload.routes';
 import annotationRouter from './routes/annotation.routes';
@@ -59,10 +60,25 @@ app.use('/api/upload', uploadRouter);
 app.use('/api/annotations', annotationRouter);
 app.use('/api/dataset', datasetRouter);
 
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  const frontendBuildPath = path.join(__dirname, '../../frontend/build');
+  
+  // Serve static files
+  app.use(express.static(frontendBuildPath));
+  
+  // Handle React routing - send all non-API routes to index.html
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(frontendBuildPath, 'index.html'));
+    }
+  });
+}
+
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
-// 404 handler
+// 404 handler for API routes
 app.use((req, res) => {
   res.status(404).json({
     error: 'Not Found',
