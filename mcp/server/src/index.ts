@@ -19,6 +19,7 @@ import { validateConfigTool } from "./tools/configValidation.js";
 import { medgemmaConfigResource } from "./resources/medgemmaConfig.js";
 import { projectGuidelinesResource } from "./resources/projectGuidelines.js";
 import { infrastructureConfigResource } from "./resources/infrastructureConfig.js";
+import { phase1ImplementationResource } from "./resources/phase1Implementation.js";
 
 // Initialize server
 const server = new Server(
@@ -47,6 +48,7 @@ const resources = [
   medgemmaConfigResource,
   projectGuidelinesResource,
   infrastructureConfigResource,
+  phase1ImplementationResource,
 ];
 
 // Register handlers

@@ -17,7 +17,8 @@ export const projectGuidelinesResource = {
           "5": "MVP Cloud Deployment",
           "6": "Scaling & Certification"
         },
-        current_phase: 0
+        current_phase: 1,
+        phase1_status: "COMPLETED"
       },
       
       development_standards: {
@@ -26,15 +27,18 @@ export const projectGuidelinesResource = {
             language: "TypeScript",
             framework: "Express",
             orm: "Drizzle ORM",
-            database: "PostgreSQL 15",
+            database: "Neon PostgreSQL",
             style_guide: "ESLint + Prettier",
-            naming_convention: "camelCase for variables, PascalCase for types/classes"
+            naming_convention: "camelCase for variables, PascalCase for types/classes",
+            implemented: true
           },
           frontend: {
             framework: "React + TypeScript",
             state_management: "Context API or Zustand",
-            styling: "CSS Modules or Styled Components",
-            component_structure: "Functional components with hooks"
+            styling: "Tailwind CSS",
+            component_structure: "Functional components with hooks",
+            implemented: true,
+            pages: ["UploadPage", "AnnotationPage", "DatasetPage"]
           },
           ai_pipeline: {
             framework: "PyTorch / Hugging Face Transformers",
@@ -83,6 +87,17 @@ export const projectGuidelinesResource = {
             "tumor",
             "inflammation",
             "normal"
+          ],
+          required_demographics: {
+            sex: "M/F (obrigatório)",
+            age_range: "0-20, 21-40, 41-60, 61-80, >80 (obrigatório)"
+          },
+          optional_classifications: [
+            "Paris Classification",
+            "JNET Classification",
+            "Kudo Pit Pattern",
+            "NICE Classification",
+            "Forrest Classification"
           ]
         },
         
