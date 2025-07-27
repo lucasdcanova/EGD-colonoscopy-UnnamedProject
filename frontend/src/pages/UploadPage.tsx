@@ -5,11 +5,13 @@ import { FiUpload, FiCheck, FiX, FiTarget } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { uploadImage } from '../utils/api.ts';
 import { ImageUploadData } from '../types';
+import LoadingSpinner from '../components/LoadingSpinner.tsx';
 
 export default function UploadPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
   const [uploading, setUploading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
   const [boundingBox, setBoundingBox] = useState({ x: 0, y: 0, width: 100, height: 100 });
   const [isSelectingBBox, setIsSelectingBBox] = useState(false);
   const [bboxCenter, setBboxCenter] = useState<{x: number, y: number} | null>(null);
@@ -22,6 +24,7 @@ export default function UploadPage() {
     const file = acceptedFiles[0];
     if (file) {
       setImageFile(file);
+      setImageLoading(true);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -106,6 +109,7 @@ export default function UploadPage() {
         setImagePreview('');
         setBboxCenter(null);
         setBoundingBox({ x: 0, y: 0, width: 100, height: 100 });
+        setImageLoading(false);
       }
     } catch (error: any) {
       toast.error(error.message || 'Erro ao enviar imagem');
@@ -137,18 +141,29 @@ export default function UploadPage() {
             </div>
           ) : (
             <div>
-              <div 
-                ref={containerRef}
-                className="relative inline-block cursor-crosshair"
-                onClick={handleImageClick}
-              >
-                <img 
-                  ref={imageRef}
-                  src={imagePreview} 
-                  alt="Preview" 
-                  className="max-w-full max-h-96 mx-auto" 
-                />
-                {bboxCenter && (
+              {imageLoading ? (
+                <div className="flex justify-center items-center min-h-[300px]">
+                  <LoadingSpinner message="Carregando imagem para marcação..." />
+                </div>
+              ) : (
+                <>
+                  <div 
+                    ref={containerRef}
+                    className="relative inline-block cursor-crosshair"
+                    onClick={handleImageClick}
+                  >
+                    <img 
+                      ref={imageRef}
+                      src={imagePreview} 
+                      alt="Preview" 
+                      className="max-w-full max-h-96 mx-auto"
+                      onLoad={() => setImageLoading(false)}
+                      onError={() => {
+                        setImageLoading(false);
+                        toast.error('Erro ao carregar imagem');
+                      }}
+                    />
+                    {bboxCenter && (
                   <>
                     {/* Center marker */}
                     <div 
@@ -168,36 +183,39 @@ export default function UploadPage() {
                         height: `${(boundingBox.height / (imageRef.current?.height || 1)) * 100}%`
                       }}
                     />
-                  </>
-                )}
-              </div>
-              <div className="mt-4 flex items-center justify-between">
-                <p className="text-sm text-gray-600">{imageFile?.name}</p>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsSelectingBBox(true)}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center gap-2"
-                  >
-                    <FiTarget /> Marcar Centro da Lesão
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setImageFile(null);
-                      setImagePreview('');
-                      setBboxCenter(null);
-                    }}
-                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                  >
-                    Remover Imagem
-                  </button>
-                </div>
-              </div>
-              {isSelectingBBox && (
-                <p className="mt-2 text-sm text-blue-600 font-medium">
-                  Clique no centro da lesão para marcar sua localização
-                </p>
+                    </>
+                  )}
+                  </div>
+                  <div className="mt-4 flex items-center justify-between">
+                    <p className="text-sm text-gray-600">{imageFile?.name}</p>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsSelectingBBox(true)}
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center gap-2"
+                      >
+                        <FiTarget /> Marcar Centro da Lesão
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImageFile(null);
+                          setImagePreview('');
+                          setBboxCenter(null);
+                          setImageLoading(false);
+                        }}
+                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                      >
+                        Remover Imagem
+                      </button>
+                    </div>
+                  </div>
+                  {isSelectingBBox && (
+                    <p className="mt-2 text-sm text-blue-600 font-medium">
+                      Clique no centro da lesão para marcar sua localização
+                    </p>
+                  )}
+                </>
               )}
             </div>
           )}
