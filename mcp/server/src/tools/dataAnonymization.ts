@@ -1,16 +1,23 @@
-import { z } from "@modelcontextprotocol/sdk/types.js";
 import sharp from "sharp";
 import crypto from "crypto";
 
 export const anonymizeDataTool = {
   name: "anonymize_data",
   description: "Anonymizes medical data by removing PHI/PII from images and JSON data",
-  inputSchema: z.object({
-    imagePath: z.string().optional().describe("Path to image file to anonymize"),
-    outputPath: z.string().optional().describe("Output path for anonymized image"),
-    jsonData: z.object({}).optional().describe("JSON data to anonymize"),
-    anonymizationLevel: z.enum(["basic", "moderate", "strict"]).default("moderate").describe("Level of anonymization to apply")
-  }),
+  inputSchema: {
+    type: "object",
+    properties: {
+      imagePath: { type: "string", description: "Path to image file to anonymize" },
+      outputPath: { type: "string", description: "Output path for anonymized image" },
+      jsonData: { type: "object", description: "JSON data to anonymize" },
+      anonymizationLevel: { 
+        type: "string", 
+        enum: ["basic", "moderate", "strict"], 
+        default: "moderate",
+        description: "Level of anonymization to apply" 
+      }
+    }
+  },
   handler: async (args: { 
     imagePath?: string; 
     outputPath?: string; 
@@ -79,9 +86,7 @@ async function anonymizeImage(
       density: undefined,     // Remove DPI info
       // Remove all EXIF data
       exif: {},
-      icc: undefined,  // Remove color profile
-      iptc: {},       // Remove IPTC data
-      xmp: {}         // Remove XMP data
+      icc: undefined  // Remove color profile
     });
     operations.push("Removed all EXIF/IPTC/XMP metadata");
 
@@ -137,7 +142,7 @@ function anonymizeJsonData(
   // Anonymization functions
   const anonymizers = {
     email: (value: string) => {
-      const [local, domain] = value.split('@');
+      const [local] = value.split('@');
       return `${local.substring(0, 2)}****@****.***`;
     },
     phone: (value: string) => value.replace(/\d/g, '*').replace(/\*{3,}/g, '***'),

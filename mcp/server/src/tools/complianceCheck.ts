@@ -1,4 +1,3 @@
-import { z } from "@modelcontextprotocol/sdk/types.js";
 import exifr from "exifr";
 
 interface ComplianceCheck {
@@ -11,11 +10,19 @@ interface ComplianceCheck {
 export const checkComplianceTool = {
   name: "check_compliance",
   description: "Checks data compliance with LGPD and HIPAA regulations for medical imaging",
-  inputSchema: z.object({
-    imagePath: z.string().optional().describe("Path to image file to check for PHI/metadata"),
-    jsonData: z.object({}).optional().describe("JSON data to check for sensitive information"),
-    checkType: z.enum(["image", "data", "both"]).default("both").describe("Type of compliance check to perform")
-  }),
+  inputSchema: {
+    type: "object",
+    properties: {
+      imagePath: { type: "string", description: "Path to image file to check for PHI/metadata" },
+      jsonData: { type: "object", description: "JSON data to check for sensitive information" },
+      checkType: { 
+        type: "string", 
+        enum: ["image", "data", "both"], 
+        default: "both",
+        description: "Type of compliance check to perform" 
+      }
+    }
+  },
   handler: async (args: { imagePath?: string; jsonData?: any; checkType?: string }) => {
     const checks: ComplianceCheck[] = [];
     let overallCompliant = true;

@@ -1,4 +1,3 @@
-import { z } from "@modelcontextprotocol/sdk/types.js";
 
 interface ValidationResult {
   isValid: boolean;
@@ -10,10 +9,18 @@ interface ValidationResult {
 export const validateConfigTool = {
   name: "validate_config",
   description: "Validates project configuration files against MedGemma requirements and best practices",
-  inputSchema: z.object({
-    configType: z.enum(["model", "training", "deployment", "data"]).describe("Type of configuration to validate"),
-    config: z.object({}).describe("Configuration object to validate")
-  }),
+  inputSchema: {
+    type: "object",
+    properties: {
+      configType: { 
+        type: "string", 
+        enum: ["model", "training", "deployment", "data"], 
+        description: "Type of configuration to validate" 
+      },
+      config: { type: "object", description: "Configuration object to validate" }
+    },
+    required: ["configType", "config"]
+  },
   handler: async (args: { configType: string; config: any }): Promise<ValidationResult> => {
     const result: ValidationResult = {
       isValid: true,

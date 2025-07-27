@@ -74,7 +74,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
   
   try {
-    const result = await tool.handler(args);
+    // Type assertion since we know each tool expects specific args
+    const result = await (tool.handler as any)(args || {});
     return {
       content: [
         {

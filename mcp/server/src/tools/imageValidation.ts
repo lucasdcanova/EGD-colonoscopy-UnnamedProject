@@ -1,5 +1,4 @@
 import sharp from "sharp";
-import { z } from "@modelcontextprotocol/sdk/types.js";
 
 const EXPECTED_WIDTH = 896;
 const EXPECTED_HEIGHT = 896;
@@ -8,10 +7,14 @@ const EXPECTED_CHANNELS = 3; // RGB
 export const validateEndoscopyImageTool = {
   name: "validate_endoscopy_image",
   description: "Validates that an image meets the requirements for MedGemma processing (896x896 RGB format)",
-  inputSchema: z.object({
-    imagePath: z.string().describe("Path to the image file to validate"),
-    checkContent: z.boolean().optional().describe("Also check if image appears to be endoscopic (optional)")
-  }),
+  inputSchema: {
+    type: "object",
+    properties: {
+      imagePath: { type: "string", description: "Path to the image file to validate" },
+      checkContent: { type: "boolean", description: "Also check if image appears to be endoscopic (optional)" }
+    },
+    required: ["imagePath"]
+  },
   handler: async (args: { imagePath: string; checkContent?: boolean }) => {
     try {
       // Load image metadata
