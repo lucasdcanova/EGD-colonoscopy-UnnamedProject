@@ -29,7 +29,17 @@
   src/
     model/
   docs/
+  mcp/
+    server/
+    docs/
   ```
+- [ ] **Implementar MCP (Model Context Protocol)**:
+  - [x] Criar servidor MCP em TypeScript
+  - [x] Implementar tool de validação de imagens endoscópicas
+  - [x] Implementar tool de verificação de compliance LGPD/HIPAA
+  - [x] Implementar tool de anonimização de dados
+  - [x] Criar resources com configurações do MedGemma
+  - [x] Documentar uso do MCP em `mcp/docs/MCP_USAGE.md`
 - [ ] Definir política de anonimização (remover PHI / EXIF).
 
 ## Fase 1 • Coleta & Pré-processamento (Semanas 1-4)
@@ -80,4 +90,5 @@
 
 ---
 ## Atualizações
-* **v0.1 (YY-MM-DD)** — Criação do roadmap inicial. 
+* **v0.1 (YY-MM-DD)** — Criação do roadmap inicial.
+* **v0.2 (2025-07-27)** — Implementação do MCP (Model Context Protocol) na Fase 0 para garantir que agentes de IA sigam os protocolos corretos do projeto. 
