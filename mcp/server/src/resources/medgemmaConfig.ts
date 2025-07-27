@@ -127,6 +127,14 @@ export const medgemmaConfigResource = {
       },
       deployment_options: {
         cloud_providers: {
+          aws: {
+            s3_bucket: "egd-endoscopia-images",
+            region: "us-east-1",
+            instance_type: "g5.xlarge",
+            spot_instances: true,
+            vpc_id: "vpc-0b7b42c02cbb31cf8",
+            security_group_id: "sg-042fea1cf4a78ad82"
+          },
           vertex_ai: {
             endpoint_type: "Custom Container",
             machine_type: "n1-standard-8",
