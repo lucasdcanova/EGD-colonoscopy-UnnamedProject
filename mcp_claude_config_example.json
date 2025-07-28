@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "egd-colonoscopy": {
+      "command": "node",
+      "args": ["/workspaces/EGD-colonoscopy-UnnamedProject/mcp/server/dist/index.js"]
+    }
+  }
+}
