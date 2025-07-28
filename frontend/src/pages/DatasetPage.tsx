@@ -7,10 +7,28 @@ export default function DatasetPage() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
 
   useEffect(() => {
-    loadStats();
+    // Check if already authenticated
+    const auth = sessionStorage.getItem('datasetAuth');
+    if (auth === 'true') {
+      setIsAuthenticated(true);
+      loadStats();
+    }
   }, []);
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === '654321') {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('datasetAuth', 'true');
+      loadStats();
+    } else {
+      toast.error('Senha incorreta');
+    }
+  };
 
   const loadStats = async () => {
     try {
@@ -60,6 +78,35 @@ export default function DatasetPage() {
       setExporting(false);
     }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+          <h2 className="text-2xl font-bold mb-6 text-center">Acesso Restrito</h2>
+          <p className="text-gray-600 text-center mb-6">
+            Digite a senha para acessar o dataset
+          </p>
+          <form onSubmit={handlePasswordSubmit}>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Digite a senha"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              autoFocus
+            />
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Entrar
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
