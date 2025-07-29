@@ -43,7 +43,7 @@ terraform.tfvars
 
 # Build outputs
 dist/
-build/
+# build/ # Comentado para permitir o commit do frontend/build
 *.egg-info/
 
 # Data files (contains sensitive medical data)
