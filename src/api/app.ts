@@ -69,6 +69,11 @@ if (process.env.NODE_ENV === 'production') {
   console.log('📍 Current working directory:', process.cwd());
   console.log('📍 Root directory:', rootDir);
   
+  // Serve test.html from root
+  app.get('/test.html', (req, res) => {
+    res.sendFile(path.join(rootDir, 'test.html'));
+  });
+  
   // Serve static files with proper MIME types
   app.use(express.static(frontendBuildPath, {
     setHeaders: (res, path) => {
